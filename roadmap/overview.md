@@ -19,10 +19,10 @@ ZK Proofs            Cross-Chain         Decentralized        VISION
 
 | Phase | Name | Status | Timeline |
 |-------|------|--------|----------|
-| 1 | Foundation | 🔨 **In Progress** | Q1-Q2 2026 |
-| 2 | Proof Engine Live | 📋 Planned | Q3-Q4 2026 |
+| 1 | Foundation | ✅ **Core Deployed** | Q1-Q2 2026 |
+| 2 | Proof Engine Live | 🔨 **In Progress** | Q3-Q4 2026 |
 | 3 | Post-Quantum Production | 📋 Planned | Q1-Q2 2027 |
-| 4 | K-PPC Chain Launch | 🔬 Research | Q3 2027+ |
+| 4 | K-PPC Chain Launch | 🔬 Research — **Asterchain L1 Mainnet** | Q3 2027+ |
 | 5 | ZK Proofs | 🔬 Research | Q1-Q2 2028 |
 | 6 | Cross-Chain | 💡 Concept | Q3 2028+ |
 | 7 | Decentralized Proof Network | 💡 Concept | 2029+ |
@@ -33,18 +33,33 @@ ZK Proofs            Cross-Chain         Decentralized        VISION
 # Phase 1 — Foundation
 
 **Timeline**: Q1-Q2 2026 (12-16 weeks)
-**Status**: 🔨 In Progress
+**Status**: ✅ Core Deployed (Base Mainnet)
 **Goal**: Ship a working K-PPE with hybrid auth and basic proof generation
 
-## Deliverables
+### Phase 1 — Deployed Components
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| KPPEAnchor smart contract | ✅ Deployed | `0x3B53F7044E47766769156bF210c2661F03Df45dd` — Base Mainnet, verified Basescan |
+| App Registry contract | ✅ Deployed | `0xcbf3e71fb2E09929682b8448442d184f8E1E37B8` — Base Mainnet |
+| Local Merkle tree builder | ✅ Deployed | `src/kpe/merkle.ts` — sorted-pair Keccak-256, max 256 leaves |
+| OnChainSender.anchorMerkleRoot() | ✅ Deployed | Only root hash (32 bytes) on-chain |
+| BatchManager.flushKPPE() | ✅ Deployed | Replaces deprecated sendBatch() |
+| KPPE_MODE routing | ✅ Deployed | kppe / legacy / disabled |
+| Chain of trust (prevRoot) | ✅ Deployed | Immutable linked batch chain |
+| Supabase schema | ✅ Deployed | merkle_batches, event_receipts, events with client_hash |
+| KA-HAP 7-layer security | ✅ Deployed | Database tables + relayer integration |
+| Test batch #1 | ✅ Confirmed | TX: `0x6506230...e401c5e5bef` |
+
+## Deliverables (Original Checklist)
 
 ### 1.1 — Project Scaffold (Week 1-2)
 - [x] Repository structure defined
 - [x] Claude Code prompts generated
-- [ ] TypeScript project initialized
-- [ ] Dependencies installed
+- [x] TypeScript project initialized
+- [x] Dependencies installed
 - [ ] CI/CD pipeline (GitHub Actions)
-- [ ] README + CLAUDE.md
+- [x] README + CLAUDE.md
 
 ### 1.2 — Classical Cryptography Module (Week 2-3)
 - [ ] Ed25519 key generation, sign, verify
@@ -90,11 +105,12 @@ ZK Proofs            Cross-Chain         Decentralized        VISION
 - [ ] Security pipeline (rate → replay → HMAC → JWT)
 
 ### 1.8 — Proof Engine v1 (Week 8-10)
-- [ ] Event hashing (Keccak-256, deterministic)
-- [ ] Merkle tree construction
+- [x] Event hashing (Keccak-256, deterministic) — client-side via SDK
+- [x] Merkle tree construction — local builder `src/kpe/merkle.ts`
 - [ ] Hybrid proof signing (Ed25519 + SPHINCS+ simulated)
-- [ ] Individual proof generation (Merkle branches)
-- [ ] Proof verification
+- [x] Individual proof generation (Merkle branches)
+- [x] Proof verification — on-chain via `verifyProofView()` + off-chain API
+- [x] On-chain anchoring — `KPPEAnchor.anchorBatch()` on Base Mainnet
 - [ ] Routes: `/proofs/batch`, `/proofs/:id`, `/proofs/verify/:batchId/:eventHash`
 
 ### 1.9 — Encrypted Storage (Week 10-12)
@@ -187,9 +203,9 @@ ZK Proofs            Cross-Chain         Decentralized        VISION
 - [ ] Cost monitoring + budget alerts
 
 ### 2.8 — On-Chain Anchoring v1
-- [ ] BNB Chain smart contract for Merkle root anchoring
-- [ ] Batch root + timestamp published on-chain
-- [ ] Verification contract (anyone can verify root on-chain)
+- [x] ~~BNB Chain~~ **Base Mainnet** smart contract for Merkle root anchoring — KPPEAnchor deployed
+- [x] Batch root + eventCount + prevRoot published on-chain
+- [x] Verification contract — `verifyProofView()` (anyone can verify on-chain)
 - [ ] Gas optimization (batch multiple roots per transaction)
 
 ### 2.9 — Multi-Client Support
@@ -272,8 +288,8 @@ ZK Proofs            Cross-Chain         Decentralized        VISION
 # Phase 4 — K-PPC Chain Launch
 
 **Timeline**: Q3 2027+ (6-12 months)
-**Status**: 🔬 Research
-**Goal**: Launch the dedicated Kairos Proof Protocol Chain
+**Status**: 🔬 Research — **Target: Asterchain L1 Mainnet**
+**Goal**: Launch the dedicated Kairos Proof Protocol Chain on Asterchain L1
 
 ## Deliverables
 
@@ -296,11 +312,11 @@ ZK Proofs            Cross-Chain         Decentralized        VISION
 - [ ] State root publication
 - [ ] Explorer / block viewer
 
-### 4.4 — Bridge from K-PPE
-- [ ] K-PPE → K-PPC proof submission pipeline
+### 4.4 — Bridge from K-PPE (Base Mainnet → Asterchain L1)
+- [ ] K-PPE → K-PPC proof submission pipeline (bridge Base → Asterchain)
 - [ ] Automatic anchoring of all proof batches
 - [ ] Dual storage: Supabase + K-PPC + Arweave (triple redundancy)
-- [ ] Fallback chain: if K-PPC down, Arweave + BNB Chain anchoring continues
+- [ ] Fallback chain: if K-PPC down, Arweave + Base Mainnet anchoring continues
 
 ### 4.5 — Verification Contract on BNB Chain
 - [ ] Smart contract for K-PPC state root verification

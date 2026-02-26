@@ -4,9 +4,11 @@ K-PPC (Kairos Proof Protocol Chain) is a dedicated blockchain designed for one p
 
 K-PPC is not a general-purpose blockchain. It doesn't host DeFi protocols, NFTs, or smart contracts. It is a purpose-built proof ledger — an immutable, decentralized record of on-chain events verified by the Kairos Proof Protocol.
 
-## Status: Research & Design Phase
+## Status: PLANNED — Asterchain L1 Mainnet
 
-K-PPC is planned for Phase 4 of the roadmap (2027+). The current focus is on K-PPE (the engine).
+> **K-PPC will be deployed on Asterchain L1 Mainnet.** Architecture and integration details are being defined. K-PPE (the engine) is already deployed on Base Mainnet and will bridge proofs to K-PPC when ready.
+
+K-PPC is planned for Phase 4 of the roadmap (2027+). The current focus is on K-PPE (the engine), which is live on Base Mainnet.
 
 ---
 
@@ -14,9 +16,9 @@ K-PPC is planned for Phase 4 of the roadmap (2027+). The current focus is on K-P
 
 ## The Deletion Problem
 
-K-PPE stores proofs in Supabase (encrypted) and generates them on Railway. Both are centralized services. If they go down — or if data is deleted — the proofs are lost.
+K-PPE stores proofs in Supabase and anchors Merkle roots on Base Mainnet via KPPEAnchor. Both are centralized services. If they go down — or if data is deleted — the proofs are lost.
 
-The Merkle root might be anchored on BNB Chain, but without the underlying proof data, the root is useless. It's like having the seal of a court document without the document itself.
+The Merkle root is anchored on Base Mainnet via `KPPEAnchor.anchorBatch()`, but without the underlying proof data, the root alone cannot verify individual events. It's like having the seal of a court document without the document itself.
 
 ## Why Not Just Use Arweave / IPFS?
 
@@ -24,7 +26,7 @@ The Merkle root might be anchored on BNB Chain, but without the underlying proof
 |----------|-----------|------------|------------|---------------|
 | Arweave | ✅ | ❌ (raw data) | ❌ | ✅ |
 | IPFS/Filecoin | ⚠️ (pinning) | ❌ | ❌ | ✅ |
-| BNB Chain | ✅ | ✅ | ❌ (expensive) | ✅ |
+| Base Mainnet | ✅ | ✅ | ❌ (expensive) | ✅ |
 | **K-PPC** | **✅** | **✅ (native)** | **✅ (purpose-built)** | **✅** |
 
 K-PPC is designed from the ground up for proof storage and verification. It understands proof structures natively. Verification is a first-class operation, not an afterthought. Query proofs by event hash, by batch, by time range, by source chain — all at the protocol level.
@@ -45,7 +47,10 @@ WITH K-PPE + K-PPC:
 
 # K-PPC Architecture
 
-## Chain Design: ZK Rollup on BNB Chain
+## Chain Design: ZK Rollup on Asterchain L1 Mainnet
+
+> **Target L1: Asterchain L1 Mainnet** — Architecture details being finalized.
+> K-PPE is currently live on **Base Mainnet** via KPPEAnchor contract.
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -64,17 +69,19 @@ WITH K-PPE + K-PPC:
 │  • verifyProof(batchId, eventHash)          │
 │  • queryProofs(filter)                      │
 │  • anchorExternal(sourceChain, rootHash)    │
+│  • bridgeFromKPPE(batchId, merkleRoot)      │
 └──────────────────┬──────────────────────────┘
                    │ state roots + ZK proofs
                    ▼
 ┌─────────────────────────────────────────────┐
-│            BNB Chain (L1)                    │
+│         Asterchain L1 Mainnet                │
 │                                             │
 │  Verification contract:                     │
 │  • Verifies K-PPC ZK proofs                 │
 │  • Stores state roots                       │
 │  • Enables cross-chain verification         │
 │  • Settlement layer                         │
+│  • Bridge from Base Mainnet K-PPE batches   │
 └─────────────────────────────────────────────┘
 ```
 
@@ -93,7 +100,7 @@ For a proof system, mathematical certainty is non-negotiable. Optimistic dispute
 | Proof finality on L1 | ~10 minutes (batch ZK proof) |
 | Throughput | 1,000+ proofs/second |
 | Storage cost | ~$0.001 per proof |
-| Gas token | BNB (bridged from L1) |
+| Gas token | Asterchain native token (TBD) |
 | No native token | Simplifies regulatory compliance |
 
 ---

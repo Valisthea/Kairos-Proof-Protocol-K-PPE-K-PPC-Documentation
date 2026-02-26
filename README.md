@@ -12,11 +12,18 @@ Built for the post-quantum era. Available now.
 
 ### What We Build
 
-| Component | Description | Status |
-|-----------|-------------|--------|
-| **Kairos Analytics** | Real-time dApp analytics platform with verifiable on-chain proofs | Active Development |
-| **K-PPE** (Proof Protocol Engine) | Open-source hybrid crypto engine (classical + post-quantum) | Phase 1 |
-| **K-PPC** (Proof Protocol Chain) | Dedicated proof chain with ZK verification | Research Phase |
+| Component | Description | Status | Chain |
+|-----------|-------------|--------|-------|
+| **Kairos Analytics** | Real-time dApp analytics platform with verifiable on-chain proofs | **Active** | Base Mainnet |
+| **K-PPE** (Proof Protocol Engine) | Trustless Merkle anchoring engine — only root hash on-chain, data stays private | **✅ Deployed** | Base Mainnet |
+| **K-PPC** (Proof Protocol Chain) | Dedicated proof chain with ZK verification | **Planned** | Asterchain L1 Mainnet |
+
+### Live Contracts (Base Mainnet — Chain 8453)
+
+| Contract | Address | Verified |
+|----------|---------|----------|
+| **KPPEAnchor** | [`0x3B53F7044E47766769156bF210c2661F03Df45dd`](https://basescan.org/address/0x3B53F7044E47766769156bF210c2661F03Df45dd) | ✅ Basescan |
+| **App Registry** | [`0xcbf3e71fb2E09929682b8448442d184f8E1E37B8`](https://basescan.org/address/0xcbf3e71fb2E09929682b8448442d184f8E1E37B8) | ✅ Basescan |
 
 ### Why It Matters
 
@@ -40,4 +47,6 @@ K-PPE is **not** built exclusively for one product. It's an open infrastructure 
 >
 > **Status**: Public repository — All rights reserved
 >
-> **Stack**: TypeScript / Supabase / Railway / liboqs (future)
+> **Stack**: TypeScript / Supabase / Base Mainnet / ethers v6 / liboqs (future)
+>
+> **Protocol**: K-PPE-v1 — Sorted-pair Keccak-256 Merkle, max 256 leaves, `anchorBatch()` on-chain

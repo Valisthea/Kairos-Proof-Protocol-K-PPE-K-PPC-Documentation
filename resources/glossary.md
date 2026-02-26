@@ -4,7 +4,10 @@
 |------|-----------|
 | **AES-256-GCM** | Advanced Encryption Standard with 256-bit key in Galois/Counter Mode. Symmetric encryption algorithm used for data at rest. |
 | **Arweave** | Permanent decentralized storage network. Pay once, store forever. |
-| **BNB Chain** | Blockchain network (formerly Binance Smart Chain) used as L1 settlement layer. |
+| **anchorBatch()** | KPPEAnchor contract method — anchors a Merkle root on-chain. Params: `appId`, `merkleRoot`, `eventCount`. |
+| **Asterchain** | Layer-1 blockchain — planned deployment target for K-PPC (Kairos Proof Protocol Chain). |
+| **Base Mainnet** | Layer-2 blockchain (Coinbase, Chain 8453) where K-PPE Merkle roots are anchored via KPPEAnchor contract. |
+| **BNB Chain** | Blockchain network (formerly Binance Smart Chain). No longer the primary L1 for K-PPE (replaced by Base Mainnet). |
 | **DEK** | Data Encryption Key. Random key used to encrypt a single data record. |
 | **Dual-Sign** | Signing data with two independent algorithms (e.g., Ed25519 + ML-DSA). Both must validate. |
 | **ECDSA** | Elliptic Curve Digital Signature Algorithm. Used by Bitcoin and Ethereum for transaction signing. Quantum-vulnerable. |
@@ -23,16 +26,22 @@
 | **KEK** | Key Encryption Key. Used to encrypt DEKs in the envelope encryption pattern. |
 | **KMAC-256** | Keccak-based MAC. Message authentication code based on SHA-3. Quantum-resistant by design. |
 | **KPP** | Kairos Proof Protocol. The overall cryptographic specification. |
+| **KPPEAnchor** | Smart contract deployed on Base Mainnet (`0x3B53F7044E47766769156bF210c2661F03Df45dd`) that stores Merkle roots on-chain. Core of the K-PPE trustless model. |
+| **KPPE_MODE** | Environment variable controlling the relayer's anchoring mode: `kppe` (production, root-only on-chain), `legacy` (deprecated, full data on-chain), `disabled` (DB only). |
 | **Merkle Tree** | Hash tree structure where each leaf is a hash of data and each node is the hash of its children. Enables efficient proof of inclusion. |
 | **MiCA** | Markets in Crypto-Assets Regulation. EU regulatory framework for crypto. |
 | **ML-DSA-65** | Module-Lattice Digital Signature Algorithm (NIST FIPS 204). Post-quantum replacement for ECDSA/EdDSA. |
 | **ML-KEM-768** | Module-Lattice Key Encapsulation Mechanism (NIST FIPS 203). Post-quantum replacement for ECDH/RSA key exchange. |
 | **MLWE** | Module Learning With Errors. Mathematical problem underlying ML-KEM and ML-DSA security. |
 | **Post-Quantum** | Cryptographic algorithms designed to be secure against quantum computer attacks. |
+| **prevRoot** | Previous batch's Merkle root, stored on-chain in each new batch. Creates an immutable chain of trust linking all batches chronologically. |
 | **RLS** | Row Level Security. Supabase/PostgreSQL feature restricting data access at the row level. |
+| **Session DNA** | Unique identifier combining wallet, user agent, and timestamp to create a session fingerprint. |
+| **Sorted-Pair Hashing** | Merkle hashing method: `keccak256(abi.encodePacked(min(a,b), max(a,b)))`. Order-independent — same result regardless of sibling position. Used by KPPEAnchor. |
 | **Shor's Algorithm** | Quantum algorithm that efficiently factors large numbers and computes discrete logarithms. Breaks RSA, ECDSA, ECDH. |
 | **SIWE** | Sign-In with Ethereum. Standard for wallet-based authentication (EIP-4361). |
 | **SPHINCS+** | Stateless Hash-Based Digital Signature. Post-quantum algorithm based solely on hash functions. Zero mathematical assumptions. Used for long-term proof signatures. |
+| **verifyProofView()** | KPPEAnchor contract read method — verifies a Merkle proof on-chain. Params: `batchId`, `eventHash`, `proof[]`, `leafIndex`. Returns `bool`. |
 | **XChaCha20-Poly1305** | Symmetric encryption algorithm. Alternative to AES-GCM with larger nonce (192-bit). Used as second layer in double encryption. |
 | **Zero-Knowledge Storage** | Architecture where the database stores only ciphertext and has no access to plaintext data or encryption keys. |
 | **ZK Proof** | Zero-Knowledge Proof. Cryptographic method to prove a statement is true without revealing the underlying data. |
@@ -79,10 +88,16 @@ A: Yes. The `/proofs/verify/:batchId/:eventHash` endpoint requires no authentica
 A: Pricing will be usage-based (per proof batch). Details in Phase 2 when multi-client support launches. For early integrators, contact us directly.
 
 **Q: What chains are supported?**
-A: Phase 1-2: BNB Chain (EVM). Phase 6: Ethereum, Arbitrum, Base, Polygon, Solana.
+A: K-PPE is deployed on **Base Mainnet** (Chain 8453). K-PPC is planned for **Asterchain L1 Mainnet**. Phase 6: Ethereum, Arbitrum, Polygon, Solana indexers.
 
 **Q: What's K-PPC and when does it launch?**
-A: K-PPC (Kairos Proof Protocol Chain) is a dedicated blockchain for permanent proof storage. Research phase now, target launch Q3 2027+.
+A: K-PPC (Kairos Proof Protocol Chain) is a dedicated blockchain for permanent proof storage, planned for **Asterchain L1 Mainnet**. Research phase now, target launch Q3 2027+.
+
+**Q: What is KPPE_MODE?**
+A: The `KPPE_MODE` environment variable controls how the relayer anchors batches: `kppe` (production — only Merkle root on-chain, data stays private), `legacy` (deprecated — full event data on-chain), `disabled` (database only).
+
+**Q: Can I verify proofs on-chain?**
+A: Yes. Call `KPPEAnchor.verifyProofView(batchId, eventHash, proof[], leafIndex)` on Base Mainnet. Fully trustless, no auth required, callable from any chain via RPC.
 
 ---
 
